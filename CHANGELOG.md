@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 - Own options window (sidebar with sections) instead of the Blizzard settings page.
 - Simulation (options > General, or `/fq demo`): every display shows test data; combat ends it.
