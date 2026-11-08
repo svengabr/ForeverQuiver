@@ -1,0 +1,5 @@
+<Bindings>
+	<Binding name="CLICK ForeverQuiverTrapsToggle:LeftButton" header="FOREVERQUIVER" category="ADDONS"/>
+	<Binding name="CLICK ForeverQuiverPetToggle:LeftButton" category="ADDONS"/>
+	<Binding name="CLICK ForeverQuiverAspectsToggle:LeftButton" category="ADDONS"/>
+</Bindings>
