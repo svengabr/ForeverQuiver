@@ -12,11 +12,18 @@ local function IsShot(name)
 end
 
 local function Current()
+	if ns.demo then
+		-- simulation: a 3 s Aimed Shot every 4 s
+		local now = GetTime()
+		local start = now - now % 4
+		if now - start < 3 then return ns.SpellName(S.AIMED_SHOT) or "Aimed Shot", start, start + 3 end
+		return nil
+	end
 	local name, _, _, startMS, endMS = UnitCastingInfo("player")
 	if not name then
 		name, _, _, startMS, endMS = UnitChannelInfo("player")
 	end
-	if not name or ns.IsSecret(name) or ns.IsSecret(startMS) then return nil end
+	if not name or ns.IsSecret(name) or not ns.Plain(startMS) or not ns.Plain(endMS) then return nil end
 	if ns.db.castbar.onlyShots and not IsShot(name) then return nil end
 	return name, startMS / 1000, endMS / 1000
 end
@@ -49,7 +56,6 @@ function M:Init()
 	bar = frame:CreateTexture(nil, "ARTWORK")
 	bar:SetPoint("TOPLEFT", 1, -1)
 	bar:SetPoint("BOTTOMLEFT", 1, 1)
-	bar:SetColorTexture(0.55, 0.6, 1, 0.9)
 	bar:SetWidth(1)
 	label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	label:SetPoint("LEFT", 4, 0)
@@ -63,6 +69,7 @@ function M:Refresh()
 	if not frame then return end
 	local db = ns.db.castbar
 	frame:SetSize(db.width, db.height)
+	bar:SetColorTexture(db.color[1], db.color[2], db.color[3], 0.9)
 	if db.enabled and ns.IsHunter() then
 		frame:SetScript("OnUpdate", OnUpdate)
 		frame:Show()

@@ -24,7 +24,7 @@ end
 
 ns.ASPECTS = { -- key, spell
 	{ "HAWK", S.ASPECT_HAWK }, { "MONKEY", S.ASPECT_MONKEY }, { "CHEETAH", S.ASPECT_CHEETAH },
-	{ "PACK", S.ASPECT_PACK }, { "BEAST", S.ASPECT_BEAST }, { "WILD", S.ASPECT_WILD }, { "VIPER", S.ASPECT_VIPER },
+	{ "PACK", S.ASPECT_PACK }, { "BEAST", S.ASPECT_BEAST }, { "WILD", S.ASPECT_WILD },
 }
 local DANGEROUS = { CHEETAH = true, PACK = true } -- daze on hit: red border
 
@@ -41,6 +41,15 @@ end
 
 function Aspect:Update()
 	local f = aspectFrame
+	if ns.demo and ns.db.aspect.enabled then
+		-- simulation: Aspect of the Cheetah, the one that gets a red border
+		f.icon:SetTexture(ns.SpellIcon(S.ASPECT_CHEETAH))
+		f.icon:SetDesaturated(false)
+		f.icon:SetAlpha(1)
+		f:SetBackdropBorderColor(1, 0.1, 0.1, 1)
+		f:Show()
+		return
+	end
 	if not (ns.db.aspect.enabled and ns.IsHunter() and ns.KnowsSpell(S.ASPECT_HAWK)) then
 		f:SetShown(not ns.db.locked and ns.db.aspect.enabled)
 		return
@@ -101,6 +110,14 @@ local tsElapsed = 0
 function Trueshot:Update()
 	local f = tsFrame
 	local db = ns.db.trueshot
+	if ns.demo and db.enabled then
+		-- simulation: the aura is about to run out
+		f.icon:SetTexture(ns.SpellIcon(S.TRUESHOT_AURA))
+		f:SetBackdropBorderColor(1, 0.8, 0, 1)
+		f.text:SetFormattedText("%d", 59 - math.floor(GetTime() % 60))
+		f:Show()
+		return
+	end
 	if not (db.enabled and ns.IsHunter() and ns.KnowsSpell(S.TRUESHOT_AURA)) then
 		f:SetShown(not ns.db.locked and db.enabled)
 		f.text:SetText("")
@@ -114,8 +131,9 @@ function Trueshot:Update()
 		f:Show()
 		return
 	end
-	local remaining = (aura.expirationTime or 0) > 0 and (aura.expirationTime - GetTime()) or nil
-	if remaining and not ns.IsSecret(remaining) and remaining < db.threshold then
+	local expires = ns.Plain(aura.expirationTime)
+	local remaining = expires and expires > 0 and (expires - GetTime()) or nil
+	if remaining and remaining < db.threshold then
 		f:SetBackdropBorderColor(1, 0.8, 0, 1)
 		f.text:SetFormattedText("%d", remaining)
 		f:Show()
@@ -157,13 +175,16 @@ end
 local Ammo = ns.RegisterModule("Ammo", {})
 local ammoFrame, ammoText
 local warned = false
+local primed = false -- the first reading after login only sets the state, so a reload doesn't warn again
 
 local function AmmoCount()
-	if UnitUsesAmmo and not UnitUsesAmmo("player") then return nil end
+	if UnitUsesAmmo and ns.Plain(UnitUsesAmmo("player")) == false then return nil end
 	if not GetInventoryItemID("player", INVSLOT_RANGED or 18) then return nil end
 	local slot = INVSLOT_AMMO or 0
 	if not GetInventoryItemID("player", slot) then return 0 end
-	return GetInventoryItemCount("player", slot) or 0
+	local count = GetInventoryItemCount("player", slot)
+	if ns.IsSecret(count) then return nil end
+	return count or 0
 end
 
 function Ammo:Update()
@@ -172,7 +193,7 @@ function Ammo:Update()
 		ammoFrame:Hide()
 		return
 	end
-	local count = AmmoCount()
+	local count = ns.demo and 37 or AmmoCount() -- simulation: nearly out
 	if count == nil then
 		ammoText:SetFormattedText(L["Ammo: %d"], 0)
 		ammoFrame:SetShown(not ns.db.locked)
@@ -193,7 +214,11 @@ function Ammo:Update()
 		ammoText:SetTextColor(1, 1, 1)
 	end
 	local low = count < db.threshold
-	if low and not warned then
+	if not primed and not ns.demo then
+		primed = true
+		warned = low
+	end
+	if low and not warned and not ns.demo then
 		warned = true
 		if db.sound then PlaySound(SOUNDKIT.RAID_WARNING or 8959, "Master") end
 		if RaidNotice_AddMessage and RaidWarningFrame then

@@ -3,7 +3,8 @@
 Hunter utilities for **WoW: Forever**, modelled on [Quiver](https://github.com/SabineWren/Quiver) for Turtle WoW.
 Written from scratch for the Forever client (modern API, Interface 16001); no Quiver code is reused.
 
-Open the options with `/fq` (or Settings → AddOns → Forever Quiver).
+Open the options window with `/fq` (or Settings → AddOns → Forever Quiver → Open options window). Colours,
+sizes, bar direction and the Tranq speech channel can be changed there, as in Quiver.
 
 ## Features
 
@@ -18,7 +19,7 @@ Open the options with `/fq` (or Settings → AddOns → Forever Quiver).
   hunter running Forever Quiver.
 - **Ammo warning** – count on screen when ammo runs low, with a sound and raid warning once.
 - **Spell menus on one key** – Traps, Pet and Aspects each get a button and a key binding
-  (Key Bindings → AddOns → Forever Quiver). The key opens the menu; keys 1–9 then cast its entries.
+  (Key Bindings → Forever Quiver). The key opens the menu; keys 1–9 then cast its entries.
 - **Beast ability tooltip** – mouse over a tameable beast to see which pet ability (and rank) taming it teaches,
   marked *new* or *known*. Data from AllTheThings' WoW: Forever beast training list.
 - **Quest arrow for Questie** – Ctrl-click a Questie map icon or a quest in the Questie tracker: an arrow points
@@ -32,7 +33,13 @@ Open the options with `/fq` (or Settings → AddOns → Forever Quiver).
 | `/fq` | options |
 | `/fq unlock`, `/fq lock` | move frames |
 | `/fq reset` | reset positions |
+| `/fq demo` | simulation: all displays show test data |
 | `/fq way <x> <y> [title]`, `/fq clear` | waypoint |
+
+## Libraries
+
+Embedded in `Libs/`: LibStub, CallbackHandler-1.0 and LibRangeCheck-3.0 (MIT, mitch0 and the WoWUIDev community),
+used for distance brackets because melee spell range checks are unreliable on the Forever client.
 
 ## Known limits
 

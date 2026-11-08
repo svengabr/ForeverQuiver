@@ -8,6 +8,10 @@
 ## OptionalDeps: Questie, TomTom
 ## X-License: GPL-3.0-or-later
 
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibRangeCheck-3.0\LibRangeCheck-3.0.lua
+
 Locale.lua
 Core.lua
 BeastData.lua
@@ -19,4 +23,6 @@ Modules\Tranq.lua
 Modules\Flyout.lua
 Modules\BeastLore.lua
 Modules\Navigator.lua
-Options.lua
+UI\Style.lua
+UI\OptionSections.lua
+UI\OptionsWindow.lua

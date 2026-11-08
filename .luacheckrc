@@ -2,7 +2,7 @@
 std = "lua51"
 max_line_length = false
 unused_args = false
-exclude_files = { ".luacheckrc", "BeastData.lua", "tools" }
+exclude_files = { ".luacheckrc", "BeastData.lua", "tools", "Libs" }
 
 globals = { "ForeverQuiver", "ForeverQuiverDB", "TomTom", "SlashCmdList", "SLASH_FOREVERQUIVER1", "SLASH_FOREVERQUIVER2", "SLASH_FOREVERQUIVER3", "BINDING_HEADER_FOREVERQUIVER" }
 
@@ -36,12 +36,13 @@ read_globals = {
 	"GetSpellInfo",
 	"GetSpellTexture",
 	"GetTime",
-	"GetUnitSpeed",
 	"INVSLOT_AMMO",
 	"INVSLOT_RANGED",
 	"InCombatLockdown",
 	"IsInGroup",
 	"IsInRaid",
+	"IsPlayerMoving",
+	"LibStub",
 	"IsPlayerSpell",
 	"IsSpellInRange",
 	"IsSpellKnown",
@@ -51,9 +52,20 @@ read_globals = {
 	"RaidNotice_AddMessage",
 	"RaidWarningFrame",
 	"SOUNDKIT",
+	"SecureHandlerSetFrameRef",
 	"SecureHandlerWrapScript",
 	"SendChatMessage",
 	"Settings",
+	"RegionalUniqueNamesEnabled",
+	"Constants",
+	"ButtonFrameTemplate_HidePortrait",
+	"ButtonFrameTemplate_HideButtonBar",
+	"UISpecialFrames",
+	"C_Texture",
+	"CreateSettingsButtonInitializer",
+	"ColorPickerFrame",
+	"UnitIsGroupLeader",
+	"UnitIsGroupAssistant",
 	"TooltipDataProcessor",
 	"UIParent",
 	"UiMapPoint",

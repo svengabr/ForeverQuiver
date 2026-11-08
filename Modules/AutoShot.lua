@@ -8,7 +8,7 @@ local S = ns.SPELL
 local AIM_TIME = 0.5
 local M = ns.RegisterModule("AutoShot", {})
 
-local frame, bar, text
+local frame, bar, text, status
 local shooting = false      -- auto-repeat active
 local reloadStart, reloadDur = 0, 0
 local aimStart = 0
@@ -39,26 +39,66 @@ local function Layout()
 	local db = ns.db.autoShot
 	frame:SetSize(db.width, db.height)
 	bar:SetHeight(db.height - 2)
+	bar:ClearAllPoints()
+	if db.direction == "CENTER" then
+		bar:SetPoint("CENTER") -- grows from the middle to both sides
+	else
+		bar:SetPoint("LEFT", 1, 0)
+	end
 	text:SetShown(db.showText)
 end
 
 local function OnUpdate()
 	local now = GetTime()
 	local width = frame:GetWidth() - 2
+	if ns.demo then
+		-- simulation: 2.5 s reload, 0.5 s aim, over and over
+		local t = now % 3
+		local db = ns.db.autoShot
+		status:SetText("")
+		if t < 2.5 then
+			local c = db.colorReload
+			bar:SetColorTexture(c[1], c[2], c[3], 0.9)
+			bar:SetWidth(math.max(1, width * (2.5 - t) / 2.5))
+			text:SetFormattedText("%.1f", 2.5 - t)
+		else
+			local c = db.colorShoot
+			bar:SetColorTexture(c[1], c[2], c[3], 0.9)
+			bar:SetWidth(math.max(1, width * (t - 2.5) / AIM_TIME))
+			text:SetFormattedText("%.1f", 3 - t)
+		end
+		frame:SetAlpha(1)
+		return
+	end
 	if Reloading(now) then
 		local remaining = reloadStart + reloadDur - now
-		bar:SetColorTexture(1, 0.15, 0.15, 0.9)
+		local c = ns.db.autoShot.colorReload
+		bar:SetColorTexture(c[1], c[2], c[3], 0.9)
 		bar:SetWidth(math.max(1, width * remaining / reloadDur))
 		text:SetFormattedText("%.1f", remaining)
 		frame:SetAlpha(1)
 		if shooting then aimStart = now end
 		return
 	end
+	if shooting and not casting and ns.InRange(S.AUTO_SHOT) == false then
+		-- Auto Shot can't reach the target: grey bar with the reason instead of a wind-up that never fires
+		local maxR
+		if ns.RangeBracket then maxR = select(2, ns.RangeBracket()) end
+		aimStart = now
+		bar:SetColorTexture(0.5, 0.5, 0.5, 0.7)
+		bar:SetWidth(width)
+		status:SetText((maxR and maxR <= 15) and L["too close"] or L["too far"])
+		text:SetText("")
+		frame:SetAlpha(1)
+		return
+	end
+	status:SetText("")
 	if shooting and not casting then
-		local moving = GetUnitSpeed("player") > 0
+		local moving = M.moving
 		if moving then aimStart = now end
 		local p = math.min(1, (now - aimStart) / AIM_TIME)
-		bar:SetColorTexture(1, 0.85, 0.1, 0.9)
+		local c = ns.db.autoShot.colorShoot
+		bar:SetColorTexture(c[1], c[2], c[3], 0.9)
 		bar:SetWidth(math.max(1, width * p))
 		text:SetText(moving and "" or string.format("%.1f", math.max(0, AIM_TIME - (now - aimStart))))
 		frame:SetAlpha(1)
@@ -71,7 +111,13 @@ end
 
 local function OnEvent(_, event, unit, _, spellID)
 	local now = GetTime()
-	if event == "START_AUTOREPEAT_SPELL" then
+	-- GetUnitSpeed is secret on this client; the movement events are not
+	if event == "PLAYER_STARTED_MOVING" then
+		M.moving = true
+	elseif event == "PLAYER_STOPPED_MOVING" then
+		M.moving = false
+		aimStart = now
+	elseif event == "START_AUTOREPEAT_SPELL" then
 		shooting = true
 		if not Reloading(now) then aimStart = now end
 	elseif event == "STOP_AUTOREPEAT_SPELL" then
@@ -109,6 +155,9 @@ function M:Init()
 	bar:SetWidth(1)
 	text = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	text:SetPoint("CENTER")
+	-- always visible, unlike the seconds text
+	status = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	status:SetPoint("CENTER")
 	ns.MakeMovable(frame, "autoShot", L["Auto Shot"], { "CENTER", "CENTER", 0, -150 })
 	frame:SetScript("OnEvent", OnEvent)
 	self:Refresh()
@@ -121,6 +170,9 @@ function M:Refresh()
 	if enabled then
 		frame:RegisterEvent("START_AUTOREPEAT_SPELL")
 		frame:RegisterEvent("STOP_AUTOREPEAT_SPELL")
+		frame:RegisterEvent("PLAYER_STARTED_MOVING")
+		frame:RegisterEvent("PLAYER_STOPPED_MOVING")
+		M.moving = IsPlayerMoving and ns.Plain(IsPlayerMoving()) and true or false
 		frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 		frame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player")
 		frame:RegisterUnitEvent("UNIT_SPELLCAST_STOP", "player")

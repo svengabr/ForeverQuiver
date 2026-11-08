@@ -18,11 +18,21 @@ local function GroupChannel()
 	if IsInGroup() then return "PARTY" end
 end
 
+-- The chat channel for announcements, from the "Tranq speech" option; nil = stay silent
+local function SpeechChannel()
+	local mode = ns.db.tranq.channel
+	local group = GroupChannel()
+	if mode == "NONE" or not group then return nil end
+	if mode == "RAID_WARNING" and IsInRaid() and (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) then
+		return "RAID_WARNING"
+	end
+	return group
+end
+
 local function Announce(msg)
-	local channel = GroupChannel()
-	if not (ns.db.tranq.announce and channel and msg and msg ~= "") then return end
-	local target = UnitName("target")
-	if ns.IsSecret(target) or not target then target = lastTarget end
+	local channel = SpeechChannel()
+	if not (channel and msg and msg ~= "") then return end
+	local target = ns.FullName("target") or lastTarget
 	msg = msg:gsub("%%t", target or "")
 	local send = (C_ChatInfo and C_ChatInfo.SendChatMessage) or SendChatMessage
 	if send then pcall(send, msg, channel) end
@@ -31,7 +41,9 @@ end
 local function Broadcast(duration)
 	local channel = GroupChannel()
 	if channel and C_ChatInfo and C_ChatInfo.SendAddonMessage then
-		pcall(C_ChatInfo.SendAddonMessage, PREFIX, "TRANQ:" .. string.format("%.1f", duration), channel)
+		-- the full name travels along: the sender field may carry the first name only
+		local msg = string.format("TRANQ:%.1f:%s", duration, ns.FullName("player") or "")
+		pcall(C_ChatInfo.SendAddonMessage, PREFIX, msg, channel)
 	end
 end
 
@@ -60,17 +72,23 @@ local function OnUpdate(_, dt)
 	elapsed = 0
 	local now = GetTime()
 	local names = {}
-	for name in pairs(cooldowns) do names[#names + 1] = name end
+	local source = cooldowns
+	if ns.demo then
+		-- simulation: you on cooldown, one hunter half way, one ready
+		local start = now - now % 20
+		source = { [ns.FullName("player") or "?"] = { start, 20 }, Legolas = { now - (now + 10) % 20, 20 }, Hawkeye = { now - 60, 20 } }
+	end
+	for name in pairs(source) do names[#names + 1] = name end
 	table.sort(names)
-	local show = ns.db.tranq.showBars and (IsInGroup() or not ns.db.locked)
+	local show = ns.db.tranq.showBars and (ns.demo or IsInGroup() or not ns.db.locked)
 	local i = 0
 	if show then
 		for _, name in ipairs(names) do
 			i = i + 1
-			local cd = cooldowns[name]
+			local cd = source[name]
 			local r = Row(i)
 			local remaining = cd[1] + cd[2] - now
-			r.name:SetText(Ambiguate(name, "short"))
+			r.name:SetText(name)
 			if remaining > 0 then
 				r.bar:SetColorTexture(0.8, 0.2, 0.2, 0.9)
 				r.bar:SetWidth(math.max(1, 148 * (1 - remaining / cd[2])))
@@ -106,23 +124,25 @@ local function OnEvent(_, event, ...)
 				if info and not ns.IsSecret(info.duration) and info.duration and info.duration > 1.5 then
 					duration = info.duration
 				end
-				cooldowns[UnitName("player")] = { GetTime(), duration }
+				cooldowns[ns.FullName("player") or UnitName("player")] = { GetTime(), duration }
 				Broadcast(duration)
 			end)
 		end
 	elseif event == "PLAYER_TARGET_CHANGED" then
-		local name = UnitName("target")
-		if not ns.IsSecret(name) then lastTarget = name end
+		lastTarget = ns.FullName("target") or lastTarget
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, msg, _, sender = ...
 		if prefix ~= PREFIX or ns.IsSecret(msg) then return end
-		local d = msg:match("^TRANQ:([%d%.]+)")
-		if d and Ambiguate(sender, "none") ~= UnitName("player") then
-			cooldowns[sender] = { GetTime(), tonumber(d) or DEFAULT_CD }
+		local d, name = msg:match("^TRANQ:([%d%.]+):?(.*)$")
+		if not d or ns.IsSecret(sender) then return end
+		if name == "" then name = (sender:gsub("%-.*$", "")) end -- 0.1.0 sent no name
+		local me = ns.FullName("player")
+		if name ~= me and Ambiguate(sender, "none") ~= UnitName("player") then
+			cooldowns[name] = { GetTime(), tonumber(d) or DEFAULT_CD }
 		end
 	elseif event == "GROUP_ROSTER_UPDATE" then
 		if not IsInGroup() then
-			local me = UnitName("player")
+			local me = ns.FullName("player") or UnitName("player")
 			for name in pairs(cooldowns) do
 				if name ~= me then cooldowns[name] = nil end
 			end

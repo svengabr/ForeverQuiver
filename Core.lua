@@ -31,12 +31,16 @@ ns.SPELL = {
 ns.defaults = {
 	locked = true,
 	frames = {},
-	autoShot = { enabled = true, width = 160, height = 8, showText = false },
-	castbar = { enabled = true, width = 160, height = 14, onlyShots = true },
-	range = { enabled = true, width = 150, height = 24 },
+	autoShot = { enabled = true, width = 160, height = 8, showText = false, direction = "LEFT",
+		colorShoot = { 1, 0.85, 0.1 }, colorReload = { 1, 0.15, 0.15 } },
+	castbar = { enabled = true, width = 160, height = 14, onlyShots = true, color = { 0.55, 0.6, 1 } },
+	range = { enabled = true, width = 150, height = 24,
+		colorMelee = { 0.1, 0.8, 0.1 }, colorDead = { 1, 0.5, 0 }, colorScare = { 0.1, 0.9, 0.4 },
+		colorScatter = { 0, 0.8, 0.8 }, colorShort = { 0.2, 0.7, 0.9 }, colorLong = { 0.1, 0.5, 1 },
+		colorMark = { 0.9, 0.2, 0.2 }, colorFar = { 0.8, 0.1, 0.1 } },
 	aspect = { enabled = true, size = 36, hideAspect = "HAWK" },
 	trueshot = { enabled = true, size = 36, threshold = 60 },
-	tranq = { enabled = true, announce = true, showBars = true,
+	tranq = { enabled = true, channel = "GROUP", showBars = true,
 		msgCast = L["Casting Tranq Shot"], msgMiss = L["*** MISSED Tranq Shot ***"] },
 	ammo = { enabled = true, threshold = 200, sound = true },
 	flyout = { enabled = true, showAnchors = true, size = 32, direction = "UP",
@@ -51,6 +55,12 @@ ns.defaults = {
 
 local issecretvalue = issecretvalue or function() return false end
 ns.IsSecret = issecretvalue
+
+-- The value, or nil if the client hands it out as a secret (comparing or doing maths on a secret errors).
+function ns.Plain(v)
+	if issecretvalue(v) then return nil end
+	return v
+end
 
 function ns.Print(...)
 	print("|cffabd473Forever Quiver|r:", ...)
@@ -134,6 +144,19 @@ function ns.FindPlayerBuffByName(name)
 		if aura.name == name then found = aura return true end
 	end)
 	return found
+end
+
+-- "First Surname": Forever's characters have a surname, which UnitName returns second while regional unique
+-- names are on (same rule as KeepOrSell). nil for a secret or missing name.
+function ns.FullName(unit)
+	local name, surname = UnitName(unit)
+	if not name or issecretvalue(name) then return nil end
+	if surname and not issecretvalue(surname) and surname ~= ""
+		and RegionalUniqueNamesEnabled and RegionalUniqueNamesEnabled() then
+		local separators = Constants and Constants.CharacterNameSeparatorConsts
+		name = name .. (separators and separators.CHARACTERNAME_SURNAME_SEPARATOR or " ") .. surname
+	end
+	return name
 end
 
 function ns.IsHunter()
@@ -230,12 +253,35 @@ function ns.RefreshAll()
 	end
 end
 
+-- Simulation: every display module shows made-up data so it can be looked at and styled without a fight.
+-- Not saved; entering combat ends it.
+ns.demo = false
+
+function ns.SetDemo(on)
+	ns.demo = on and true or false
+	ns.RefreshAll()
+end
+
+local demoWatch = CreateFrame("Frame")
+demoWatch:RegisterEvent("PLAYER_REGEN_DISABLED")
+demoWatch:SetScript("OnEvent", function()
+	if ns.demo then
+		ns.SetDemo(false)
+		ns.Print(L["Simulation ended (combat)."])
+	end
+end)
+
 local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:RegisterEvent("PLAYER_LOGIN")
 loader:SetScript("OnEvent", function(self, event, arg1)
 	if event == "ADDON_LOADED" and arg1 == ADDON then
 		ForeverQuiverDB = ForeverQuiverDB or {}
+		local t = ForeverQuiverDB.tranq
+		if t and t.announce ~= nil and t.channel == nil then -- 0.1.0 had an on/off switch
+			t.channel = t.announce and "GROUP" or "NONE"
+			t.announce = nil
+		end
 		MergeDefaults(ForeverQuiverDB, ns.defaults)
 		ns.db = ForeverQuiverDB
 	elseif event == "PLAYER_LOGIN" then
@@ -265,6 +311,10 @@ SlashCmdList.FOREVERQUIVER = function(msg)
 	elseif cmd == "reset" then
 		ns.ResetPositions()
 		ns.Print(L["Positions reset."])
+	elseif cmd == "demo" or cmd == "test" then
+		ns.SetDemo(not ns.demo)
+	elseif cmd == "debug" and ns.DebugRange then
+		ns.DebugRange()
 	elseif cmd == "way" and ns.Nav then
 		ns.Nav:SlashWay(rest)
 	elseif cmd == "clear" and ns.Nav then

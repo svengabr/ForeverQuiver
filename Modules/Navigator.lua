@@ -15,16 +15,20 @@ local function WorldPos(mapID, x, y)
 	if not (C_Map and C_Map.GetWorldPosFromMapPos) then return nil end
 	local cont, pos = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(x, y))
 	if not pos then return nil end
-	return cont, pos:GetXY()
+	local wx, wy = pos:GetXY()
+	cont, wx, wy = ns.Plain(cont), ns.Plain(wx), ns.Plain(wy)
+	if not (cont and wx and wy) then return nil end
+	return cont, wx, wy
 end
 
 local function PlayerWorldPos()
-	local mapID = C_Map.GetBestMapForUnit("player")
+	local mapID = ns.Plain(C_Map.GetBestMapForUnit("player"))
 	if not mapID then return nil end
 	local pos = C_Map.GetPlayerMapPosition(mapID, "player")
 	if not pos then return nil end
 	local px, py = pos:GetXY()
-	if ns.IsSecret(px) then return nil end
+	px, py = ns.Plain(px), ns.Plain(py)
+	if not (px and py) then return nil end
 	return WorldPos(mapID, px, py)
 end
 
@@ -75,8 +79,18 @@ end
 local elapsed = 0
 local function OnUpdate(_, dt)
 	elapsed = elapsed + dt
-	if elapsed < 0.05 or not target then return end
+	if elapsed < 0.05 then return end
 	elapsed = 0
+	if ns.demo and not target then
+		-- simulation: a slowly circling target
+		local now = GetTime()
+		title:SetText(L["Demo target"])
+		arrow:SetRotation(now % (2 * math.pi))
+		arrow:Show()
+		dist:SetFormattedText("%d yd", 120 + math.floor(80 * math.sin(now / 3)))
+		return
+	end
+	if not target then return end
 	title:SetText(target.title or "")
 	local pc, px, py = PlayerWorldPos()
 	local tc, tx, ty = WorldPos(target[1], target[2], target[3])
@@ -141,7 +155,7 @@ end
 function Nav:Refresh()
 	if not frame then return end
 	local db = ns.db.nav
-	local show = db.enabled and db.arrow and (target ~= nil or not ns.db.locked)
+	local show = db.enabled and db.arrow and (target ~= nil or ns.demo or not ns.db.locked)
 	frame:SetShown(show)
 	if not target then
 		arrow:Show()
