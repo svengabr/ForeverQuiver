@@ -3,7 +3,7 @@
 ## Notes: Hunter utilities for WoW: Forever: Auto Shot timer, castbar, range indicator, aspect and Trueshot reminders, Tranq announcer, ammo warning, spell menus on one key, beast ability tooltips and a Questie quest arrow.
 ## Notes-deDE: Jäger-Werkzeuge für WoW: Forever: Auto-Shot-Timer, Zauberleiste, Reichweite, Aspekt- und Volltreffer-Erinnerung, Tranq-Ansage, Munitionswarnung, Zaubermenüs auf einer Taste, Wildtier-Fähigkeiten im Tooltip und ein Questpfeil für Questie.
 ## Author: Sven
-## Version: 0.2.0
+## Version: 0.2.1
 ## SavedVariables: ForeverQuiverDB
 ## OptionalDeps: Questie, TomTom
 ## X-License: GPL-3.0-or-later

@@ -30,7 +30,7 @@ sizes, bar direction and the Tranq speech channel can be changed there, as in Qu
 
 | Command | |
 |---|---|
-| `/fq` | options |
+| `/fq`, `/qq`, `/quiver` | options window |
 | `/fq unlock`, `/fq lock` | move frames |
 | `/fq reset` | reset positions |
 | `/fq demo` | simulation: all displays show test data |

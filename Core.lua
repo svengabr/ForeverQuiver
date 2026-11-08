@@ -302,6 +302,8 @@ end)
 SLASH_FOREVERQUIVER1 = "/fq"
 SLASH_FOREVERQUIVER2 = "/fquiver"
 SLASH_FOREVERQUIVER3 = "/foreverquiver"
+SLASH_FOREVERQUIVER4 = "/qq" -- Quiver's own command, for players coming from Turtle WoW
+SLASH_FOREVERQUIVER5 = "/quiver"
 SlashCmdList.FOREVERQUIVER = function(msg)
 	local cmd, rest = strtrim(msg or ""):match("^(%S*)%s*(.-)$")
 	cmd = cmd:lower()

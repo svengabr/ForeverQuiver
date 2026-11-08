@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- `/qq` (Quiver's command) and `/quiver` open the options too.
+
 ## 0.2.0
 
 - Own options window (sidebar with sections) instead of the Blizzard settings page.

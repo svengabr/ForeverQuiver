@@ -57,7 +57,7 @@ function ns.BuildOptionSections()
 			},
 			{
 				Note(L["Hunter utilities for WoW: Forever, inspired by Quiver (Turtle WoW)."]),
-				Note(L["/fq opens this window, /fq lock and /fq unlock move frames, /fq debug prints range data."]),
+				Note(L["/fq or /qq opens this window, /fq lock and /fq unlock move frames, /fq debug prints range data."]),
 			},
 		} },
 		{ id = "autoShot", label = L["Auto Shot timer"], icon = "Ability_Whirlwind", columns = {

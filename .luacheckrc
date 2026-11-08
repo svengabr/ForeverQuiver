@@ -4,7 +4,7 @@ max_line_length = false
 unused_args = false
 exclude_files = { ".luacheckrc", "BeastData.lua", "tools", "Libs" }
 
-globals = { "ForeverQuiver", "ForeverQuiverDB", "TomTom", "SlashCmdList", "SLASH_FOREVERQUIVER1", "SLASH_FOREVERQUIVER2", "SLASH_FOREVERQUIVER3", "BINDING_HEADER_FOREVERQUIVER" }
+globals = { "ForeverQuiver", "ForeverQuiverDB", "TomTom", "SlashCmdList", "SLASH_FOREVERQUIVER1", "SLASH_FOREVERQUIVER2", "SLASH_FOREVERQUIVER3", "SLASH_FOREVERQUIVER4", "SLASH_FOREVERQUIVER5", "BINDING_HEADER_FOREVERQUIVER" }
 
 read_globals = {
 	"Ambiguate",
