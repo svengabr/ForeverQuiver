@@ -178,8 +178,8 @@ local function OnUpdate(_, dt)
 	if elapsed < 0.05 then return end
 	elapsed = 0
 	local target = Target()
-	if ns.demo and not target then
-		-- simulation: a slowly circling target
+	if ns.demo and (not target or ns.demoFreeze) then
+		-- simulation: a slowly circling target. In pictures (Shots.lua) it also replaces a real quest target.
 		local now = ns.DemoClock("nav")
 		title:SetText(ns.demoFreeze and ns.demoFreeze.navTitle or L["Demo target"])
 		arrow:SetRotation(now % (2 * math.pi))
