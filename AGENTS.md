@@ -28,7 +28,9 @@ Auto Shot bar, Questie arrow). Written from scratch; do not paste Quiver code (l
 
 `media/logo.svg` is the source of the logo (a quiver on the teal medallion, in the look of the maintainer's other
 addons). `sh media/render-logo.sh` renders `media/logo.png` (512×512, the CurseForge logo) and `Icon.tga` (64×64,
-the addon list icon named in the TOC). `docs/curseforge.md` holds the texts for the CurseForge project page; its
+the addon list icon named in the TOC). `media/gallery/*.jpg` are the CurseForge gallery images:
+`/fq shots` in the client, then `python media/gallery/crop.py "<Screenshots folder>"` cuts the five newest
+screenshots to 1920×1080 (boxes for a 3440×1440 screen). `docs/curseforge.md` holds the texts for the CurseForge project page; its
 description is the README without the title and logo.
 
 ## Client facts
