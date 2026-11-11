@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- `/fq shots`: the quest arrow shows the made-up target even when a real quest is tracked, and the world picture
+  hides the names over players' heads.
+
 ## 0.3.0
 
 - The addon list shows the addon's own icon.

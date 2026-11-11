@@ -9,6 +9,7 @@ globals = { "ForeverQuiver", "ForeverQuiverDB", "TomTom", "SlashCmdList", "SLASH
 read_globals = {
 	"Ambiguate",
 	"C_AddOns",
+	"C_CVar",
 	"C_ChatInfo",
 	"C_Map",
 	"C_Secrets",

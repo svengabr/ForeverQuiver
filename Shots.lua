@@ -1,7 +1,7 @@
 -- /fq shots: takes the reference screenshots for the gallery. Nobody has a fight at hand in which the Auto Shot
 -- timer, an Aimed Shot cast, three hunters' Tranq cooldowns and a low quiver all show at once, so the pictures use
 -- the simulation (/fq demo) with its clock stopped: every display is frozen at one made-up moment and looks the
--- same in every picture. The player's name is made up too. For the world picture the rest of the interface is
+-- same in every picture. The player's name is made up too, and other players' names are hidden. For the world picture the rest of the interface is
 -- hidden, like with Alt-Z. The game names a screenshot after the second it was taken in, so the pictures are two
 -- seconds apart. /fq shots demo shows the same frozen simulation for pictures taken by hand.
 local _, ns = ...
@@ -77,6 +77,31 @@ local function HideInterface(hide)
 	ns.RefreshAll()
 end
 
+-- Names over players' heads belong to the game world and stay when the interface is hidden. For the world picture
+-- they are switched off, so no other player's name ends up in the gallery, and put back right after. Only the
+-- name cvars: the nameplate ones can't be changed in combat, and a run that combat stops must still clean up.
+local NAME_CVARS = { "UnitNameOwn", "UnitNameFriendlyPlayerName", "UnitNameEnemyPlayerName",
+	"UnitNameFriendlyPetName", "UnitNameEnemyPetName" }
+local names -- [cvar] = the player's value while the names are hidden
+
+local function HideNames(hide)
+	if not (C_CVar and C_CVar.GetCVar and C_CVar.SetCVar) then return end
+	if hide then
+		if names then return end
+		names = {}
+		for _, cvar in ipairs(NAME_CVARS) do
+			local value = C_CVar.GetCVar(cvar) -- nil for a cvar this client doesn't have
+			if value ~= nil then
+				names[cvar] = value
+				C_CVar.SetCVar(cvar, "0")
+			end
+		end
+	elseif names then
+		for cvar, value in pairs(names) do C_CVar.SetCVar(cvar, value) end
+		names = nil
+	end
+end
+
 -- A plain dark sheet over the whole screen. With `raise` the displays sit on top of it and show alone; without,
 -- they stay behind it and only the options window (strata DIALOG, raised above the sheet) is in the picture.
 local backdrop
@@ -127,10 +152,12 @@ local SHOTS = {
 	{ "01-world", function()
 		Options(nil)
 		Backdrop(false)
+		HideNames(true)
 		HideInterface(true)
 	end },
 	-- the displays alone on the dark sheet
 	{ "02-displays", function()
+		HideNames(false)
 		HideInterface(false)
 		Backdrop(true, true)
 	end },
@@ -153,6 +180,7 @@ local running
 local function Finish(state)
 	running = nil
 	if state.status and state.status.RegisterEvent then state.status:RegisterEvent("SCREENSHOT_SUCCEEDED") end
+	pcall(HideNames, false) -- first: the player's own settings
 	pcall(HideInterface, false) -- in case a step failed in between
 	pcall(Backdrop, false)
 	saved = nil
