@@ -1,0 +1,15 @@
+package-as: ForeverQuiver
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - .gitignore
+  - .luacheckrc
+  - .github
+  - .pkgmeta
+  - AGENTS.md
+  - docs
+  - media
+  - tools

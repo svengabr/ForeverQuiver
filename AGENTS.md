@@ -46,3 +46,16 @@ description is the README without the title and logo.
 - No unit tests; in-game behaviour can only be checked in the client – say so honestly.
 - luacheck: `docker run --rm -v "$PWD:/data" -w /data ghcr.io/lunarmodules/luacheck .` – add new globals to
   `.luacheckrc`.
+
+## Release
+
+Publishing is automatic via `.github/workflows/release.yml` (BigWigsMods/packager) to CurseForge (project
+1798955) and GitHub Releases, **only on tags** `v*`, never on a plain push. It needs the repo secret `CF_API_KEY`.
+
+1. Add the new version to `CHANGELOG.md` (heading `## X.Y.Z`) and commit.
+2. Create an annotated tag `vX.Y.Z` and push it; that starts the upload.
+
+Don't replace `## Version: @project-version@` by hand, the packager sets it from the tag; a source checkout
+shows `dev`. New files that don't belong in the addon ZIP go into `.pkgmeta` under `ignore`. The README is also
+the CurseForge project description: after README changes, remind the maintainer to paste it there by hand,
+without the title and the logo. Tags and pushes only after the maintainer approves.
