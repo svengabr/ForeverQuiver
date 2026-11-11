@@ -150,6 +150,8 @@ function ns.BuildOptionSections()
 				Check("flyout", "traps", L["Traps"]),
 				Check("flyout", "pet", L["Pet"]),
 				Check("flyout", "aspects", L["Aspects"]),
+				{ kind = "dragmenus", menus = { { "Traps", L["Traps"] }, { "Pet", L["Pet"] }, { "Aspects", L["Aspects"] } } },
+				Note(L["Drag a menu onto an action bar slot; it pops up there."]),
 			},
 			{
 				Check("flyout", "showAnchors", L["Show menu buttons on screen"]),
@@ -169,11 +171,14 @@ function ns.BuildOptionSections()
 		{ id = "nav", label = L["Quest arrow"], icon = "INV_Misc_Map_01", columns = {
 			{
 				Check("nav", "enabled", ENABLE),
-				Check("nav", "arrow", L["Show arrow"]),
+				Check("nav", "auto", L["Always point to the nearest quest objective"],
+					L["Checks every quest in your log with Questie's data: the nearest open objective, or the turn-in once a quest is done."]),
+				Check("nav", "arrow", L["Show arrow"], L["Not shown with TomTom installed: TomTom's arrow takes over."]),
 				Check("nav", "native", L["Also set the game's map pin"]),
 			},
 			{
-				Note(L["Ctrl-click a Questie map icon or quest in the tracker to point the arrow there."]),
+				Note(L["With TomTom installed, the target goes to TomTom and its arrow shows the way."]),
+				Note(L["Ctrl-click a Questie map icon or quest in the tracker to point the arrow there instead, until you arrive or right-click the arrow."]),
 			},
 		} },
 	}

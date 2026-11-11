@@ -75,8 +75,9 @@ local function OnUpdate(_, dt)
 	local source = cooldowns
 	if ns.demo then
 		-- simulation: you on cooldown, one hunter half way, one ready
+		now = ns.DemoClock("tranq")
 		local start = now - now % 20
-		source = { [ns.FullName("player") or "?"] = { start, 20 }, Legolas = { now - (now + 10) % 20, 20 }, Hawkeye = { now - 60, 20 } }
+		source = { [ns.DemoName()] = { start, 20 }, Legolas = { now - (now + 10) % 20, 20 }, Hawkeye = { now - 60, 20 } }
 	end
 	for name in pairs(source) do names[#names + 1] = name end
 	table.sort(names)

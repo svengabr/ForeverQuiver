@@ -16,6 +16,9 @@ Auto Shot bar, Questie arrow). Written from scratch; do not paste Quiver code (l
   `.contrib/.db/forever/character/hunter/beast training.lua`. Do not edit by hand.
 - `UI/` – options window: `OptionSections.lua` is the data (sections, controls), `OptionsWindow.lua` draws it,
   `Style.lua` the look (same as the maintainer's KeepOrSell).
+- `Shots.lua` – `/fq shots`: gallery screenshots. It freezes the simulation through `ns.demoFreeze`; a module's
+  simulation branch must read time from `ns.DemoClock(key)` and the player's name from `ns.DemoName()`, never
+  `GetTime()` or the real name, or the pictures differ from run to run. Secure frames are left alone.
 - `Modules/Flyout.lua` – secure buttons. Anything that touches them must run out of combat; `Rebuild` defers
   to PLAYER_REGEN_ENABLED. Buttons register only for the click type matching `ActionButtonUseKeyDown`.
 - `Modules/Navigator.lua` – defines a minimal global `TomTom` (AddWaypoint/RemoveWaypoint) only when TomTom is not

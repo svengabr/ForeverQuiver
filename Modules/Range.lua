@@ -100,7 +100,7 @@ local function OnUpdate(_, dt)
 	elapsed = 0
 	if ns.demo then
 		-- simulation: every bracket for 1.5 s in turn
-		local entry = DEMO_ORDER[math.floor(GetTime() / 1.5) % #DEMO_ORDER + 1]
+		local entry = DEMO_ORDER[math.floor(ns.DemoClock("range") / 1.5) % #DEMO_ORDER + 1]
 		local c = ns.db.range[COLOR_KEYS[entry[1]]]
 		frame:SetBackdropColor(c[1], c[2], c[3], 0.75)
 		text:SetText(L[entry[2]])

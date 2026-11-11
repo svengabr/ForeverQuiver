@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0
+
+- `/fq shots` takes the screenshots for the gallery: the simulation frozen at one moment, a made-up character
+  name, the rest of the interface hidden for the world picture. `/fq shots demo` shows the frozen simulation for
+  pictures taken by hand.
+- Quest arrow always points at the nearest open objective of all quests in the log (turn-in once done), from
+  Questie's data. With TomTom installed, TomTom gets the target and shows its arrow. Ctrl-click in Questie still
+  overrides it until you arrive.
+- Spell menus on the action bar: drag a menu icon from the options (or the menu button) onto a slot; it
+  creates a macro ("FQ Traps", "FQ Pet", "FQ Aspects") and the menu pops up at that slot,
+  opening away from the screen edge (vertical bar on the right: to the left). The on-screen menu button hides
+  while its macro is on a bar.
+
 ## 0.2.1
 
 - `/qq` (Quiver's command) and `/quiver` open the options too.

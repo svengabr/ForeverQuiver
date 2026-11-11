@@ -114,7 +114,7 @@ function Trueshot:Update()
 		-- simulation: the aura is about to run out
 		f.icon:SetTexture(ns.SpellIcon(S.TRUESHOT_AURA))
 		f:SetBackdropBorderColor(1, 0.8, 0, 1)
-		f.text:SetFormattedText("%d", 59 - math.floor(GetTime() % 60))
+		f.text:SetFormattedText("%d", 59 - math.floor(ns.DemoClock("trueshot") % 60))
 		f:Show()
 		return
 	end

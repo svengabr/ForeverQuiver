@@ -14,7 +14,7 @@ end
 local function Current()
 	if ns.demo then
 		-- simulation: a 3 s Aimed Shot every 4 s
-		local now = GetTime()
+		local now = ns.DemoClock("castbar")
 		local start = now - now % 4
 		if now - start < 3 then return ns.SpellName(S.AIMED_SHOT) or "Aimed Shot", start, start + 3 end
 		return nil
@@ -37,7 +37,7 @@ local function OnUpdate()
 		timer:SetText("")
 		return
 	end
-	local now = GetTime()
+	local now = ns.demo and ns.DemoClock("castbar") or GetTime()
 	local p = math.min(1, math.max(0, (now - startT) / math.max(0.01, endT - startT)))
 	bar:SetWidth(math.max(1, (frame:GetWidth() - 2) * p))
 	label:SetText(name)

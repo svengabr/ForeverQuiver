@@ -1,6 +1,9 @@
 -- Spell menus: one key (or a click on the anchor button) opens a row of secure spell buttons, e.g. all traps.
 -- While a menu is open, keys 1-9 cast its entries; casting closes the menu. Everything that changes the
 -- secure frames runs out of combat only; changes made in combat are applied on PLAYER_REGEN_ENABLED.
+-- Action bars: addons can't add real flyouts, so each menu has a macro ("FQ Traps" ...) that /clicks its toggle.
+-- The Blizzard action buttons holding such a macro are handed to the toggle as frame refs, and the menu pops up
+-- at the one under the mouse (or the first one when opened by key).
 local _, ns = ...
 local L = ns.L
 
@@ -29,14 +32,73 @@ local SNIPPET_TOGGLE = [[
 	local f = self:GetFrameRef("flyout")
 	if f:IsShown() then
 		f:Hide()
-	elseif (f:GetAttribute("count") or 0) > 0 then
-		-- only one menu at a time: close the others first, so the 1-9 keys belong to this one
-		for i = 1, 2 do
-			local other = self:GetFrameRef("other" .. i)
-			if other then other:Hide() end
-		end
-		f:Show()
+		return
 	end
+	local count = f:GetAttribute("count") or 0
+	if count == 0 then return end
+	-- only one menu at a time: close the others first, so the 1-9 keys belong to this one
+	for i = 1, 2 do
+		local other = self:GetFrameRef("other" .. i)
+		if other then other:Hide() end
+	end
+	-- pop up at the action bar slot holding this menu's macro: the one under the mouse, else the first shown;
+	-- each slot brings its direction (away from the screen edge, along the bar's free side)
+	local target, dir
+	local n = self:GetAttribute("slots") or 0
+	for i = 1, n do
+		local b = self:GetFrameRef("slot" .. i)
+		if b and b:IsVisible() and b:IsUnderMouse() then
+			target, dir = b, self:GetAttribute("slotdir" .. i)
+			break
+		end
+	end
+	if not target then
+		for i = 1, n do
+			local b = self:GetFrameRef("slot" .. i)
+			if b and b:IsVisible() then
+				target, dir = b, self:GetAttribute("slotdir" .. i)
+				break
+			end
+		end
+	end
+	target = target or self
+	dir = dir or self:GetAttribute("dir") or "UP"
+	local size = self:GetAttribute("size") or 32
+	local step = size + 2
+	local length = count * step - 2
+	f:ClearAllPoints()
+	if dir == "UP" or dir == "DOWN" then
+		f:SetWidth(size)
+		f:SetHeight(length)
+	else
+		f:SetWidth(length)
+		f:SetHeight(size)
+	end
+	if dir == "UP" then
+		f:SetPoint("BOTTOM", target, "TOP", 0, 2)
+	elseif dir == "DOWN" then
+		f:SetPoint("TOP", target, "BOTTOM", 0, -2)
+	elseif dir == "LEFT" then
+		f:SetPoint("RIGHT", target, "LEFT", -2, 0)
+	else
+		f:SetPoint("LEFT", target, "RIGHT", 2, 0)
+	end
+	for i = 1, count do
+		local b = self:GetFrameRef("btn" .. i)
+		if b then
+			b:ClearAllPoints()
+			if dir == "UP" then
+				b:SetPoint("BOTTOM", f, "BOTTOM", 0, (i - 1) * step)
+			elseif dir == "DOWN" then
+				b:SetPoint("TOP", f, "TOP", 0, -(i - 1) * step)
+			elseif dir == "LEFT" then
+				b:SetPoint("RIGHT", f, "RIGHT", -(i - 1) * step, 0)
+			else
+				b:SetPoint("LEFT", f, "LEFT", (i - 1) * step, 0)
+			end
+		end
+	end
+	f:Show()
 ]]
 
 local SNIPPET_SHOW = [[
@@ -82,9 +144,15 @@ local function CreateGroup(g, index)
 		GameTooltip:SetText(g.label)
 		local key = GetBindingKey("CLICK " .. self:GetName() .. ":LeftButton")
 		if key then GameTooltip:AddLine(GetBindingText(key), 1, 1, 1) end
+		GameTooltip:AddLine(L["Drag onto an action bar to use the menu from there."], 0.7, 0.7, 0.7, true)
 		GameTooltip:Show()
 	end)
 	toggle:SetScript("OnLeave", GameTooltip_Hide)
+	-- drag the button (frames locked) to put the menu's macro on an action bar
+	toggle:RegisterForDrag("LeftButton")
+	toggle:SetScript("OnDragStart", function()
+		if ns.db.locked then ns.PickupMenuMacro(g.key) end
+	end)
 
 	local flyout = CreateFrame("Frame", "ForeverQuiver" .. g.key .. "Flyout", UIParent, "SecureHandlerShowHideTemplate")
 	flyout:SetFrameStrata("DIALOG")
@@ -136,8 +204,22 @@ local function GetButton(g, i)
 	b:SetScript("OnLeave", GameTooltip_Hide)
 	-- close the menu after a cast
 	SecureHandlerWrapScript(b, "OnClick", g.flyout, [[ return button, "close" ]], [[ owner:Hide() ]])
+	SecureHandlerSetFrameRef(g.toggle, "btn" .. i, b)
 	g.buttons[i] = b
 	return b
+end
+
+-- The on-screen menu button. It must stay shown for its key binding to keep working, so "hidden" only means
+-- invisible. It hides itself while the menu's macro sits on an action bar (no need for both), except when the
+-- frames are unlocked for moving. Out of combat only (protected frame).
+function M.ApplyAnchor(g)
+	if InCombatLockdown() then return end
+	local db = ns.db.flyout
+	local onBar = (g.toggle:GetAttribute("slots") or 0) > 0
+	local visible = g.enabled and (g.count or 0) > 0
+		and (not ns.db.locked or (db.showAnchors and not onBar))
+	g.toggle:SetAlpha(visible and 1 or 0)
+	g.toggle:EnableMouse(visible and true or false)
 end
 
 local function Build(g)
@@ -172,10 +254,11 @@ local function Build(g)
 				b.known = isKnown
 				b:SetSize(size, size)
 				b:ClearAllPoints()
+				-- laid out inside the flyout, which the toggle snippet anchors where it should pop up
 				if db.direction == "UP" then
-					b:SetPoint("BOTTOM", g.toggle, "TOP", 0, 2 + (n - 1) * (size + 2))
+					b:SetPoint("BOTTOM", g.flyout, "BOTTOM", 0, (n - 1) * (size + 2))
 				else
-					b:SetPoint("LEFT", g.toggle, "RIGHT", 2 + (n - 1) * (size + 2), 0)
+					b:SetPoint("LEFT", g.flyout, "LEFT", (n - 1) * (size + 2), 0)
 				end
 				b:Show()
 			end
@@ -186,6 +269,12 @@ local function Build(g)
 		g.buttons[i]:Hide()
 	end
 	g.flyout:SetAttribute("count", n)
+	local length = math.max(1, n * (size + 2) - 2)
+	if db.direction == "UP" then g.flyout:SetSize(size, length) else g.flyout:SetSize(length, size) end
+	g.flyout:ClearAllPoints()
+	g.flyout:SetPoint("BOTTOM", g.toggle, "TOP", 0, 2)
+	g.toggle:SetAttribute("dir", db.direction == "UP" and "UP" or "RIGHT")
+	g.toggle:SetAttribute("size", size)
 	g.known = known
 	g.toggle.icon:SetTexture(n > 0 and g.buttons[1].icon:GetTexture() or "Interface\\Icons\\INV_Misc_QuestionMark")
 	for i = 1, n do
@@ -195,12 +284,153 @@ local function Build(g)
 		end
 	end
 	g.toggle.icon:SetDesaturated(known == 0)
+	M.UpdateMacroIcon(g)
 
-	-- The toggle must stay shown for its key binding to keep working; "hidden" anchors are just invisible.
-	local visible = enabled and n > 0 and (db.showAnchors or not ns.db.locked)
+	g.enabled, g.count = enabled, n
 	g.toggle:SetShown(enabled)
-	g.toggle:SetAlpha(visible and 1 or 0)
-	g.toggle:EnableMouse(visible and true or false)
+	M.ApplyAnchor(g)
+end
+
+-------------------------------------------------------------------------------
+-- Action bar macros
+-------------------------------------------------------------------------------
+
+local QUESTION_MARK = 134400
+local BAR_BUTTONS = { "ActionButton", "MultiBarBottomLeftButton", "MultiBarBottomRightButton", "MultiBarRightButton",
+	"MultiBarLeftButton", "MultiBar5Button", "MultiBar6Button", "MultiBar7Button" }
+local slotsPending = false
+
+local function MacroName(g) return "FQ " .. g.key end
+local function MacroBody(g) return "/click " .. g.toggle:GetName() .. " LeftButton 1" end
+local function MacroIcon(g) return g.toggle.icon:GetTexture() or QUESTION_MARK end
+
+local function FindGroup(key)
+	for _, g in ipairs(GROUPS) do
+		if g.key == key then return g end
+	end
+end
+
+-- the icon a menu shows (its first known spell), for the options window
+function ns.MenuIcon(key)
+	local g = FindGroup(key)
+	return g and g.toggle and MacroIcon(g) or QUESTION_MARK
+end
+
+-- Creates (or refreshes) the menu's account macro and puts it on the cursor, ready to drop on an action bar
+function ns.PickupMenuMacro(key)
+	local g = FindGroup(key)
+	if not g then return end
+	if InCombatLockdown() then
+		ns.Print(L["Not in combat."])
+		return
+	end
+	local name, body, icon = MacroName(g), MacroBody(g), MacroIcon(g)
+	local index = GetMacroIndexByName(name)
+	if index == 0 then
+		local numAccount = GetNumMacros()
+		if numAccount >= (MAX_ACCOUNT_MACROS or 120) then
+			ns.Print(L["No room for another general macro."])
+			return
+		end
+		index = CreateMacro(name, icon, body, nil)
+	else
+		EditMacro(index, name, icon, body)
+	end
+	if index and index > 0 then PickupMacro(index) end
+end
+
+-- keeps the macro icon on the menu's first known spell
+function M.UpdateMacroIcon(g)
+	if InCombatLockdown() then return end
+	local index = GetMacroIndexByName(MacroName(g))
+	if index == 0 then return end
+	local _, icon, body = GetMacroInfo(index)
+	if icon ~= MacroIcon(g) or body ~= MacroBody(g) then
+		EditMacro(index, MacroName(g), MacroIcon(g), MacroBody(g))
+	end
+end
+
+-- Which way a menu opens from an action button: vertical bars open away from their screen edge (right half ->
+-- left), horizontal bars towards the screen middle (bottom half -> up). Same idea as Blizzard's own flyouts.
+local DIRECTIONS = { UP = true, DOWN = true, LEFT = true, RIGHT = true }
+
+local function SlotDirection(btn)
+	-- Blizzard's bars know the direction their own spell flyouts open in; use that first
+	local bar = btn.bar
+	if bar and bar.GetSpellFlyoutDirection then
+		local ok, dir = pcall(bar.GetSpellFlyoutDirection, bar)
+		if ok and DIRECTIONS[dir] then return dir end
+	end
+	bar = btn:GetParent()
+	local x, y = btn:GetCenter()
+	if not (x and y) then return "UP" end
+	local scale = btn:GetEffectiveScale() / UIParent:GetEffectiveScale()
+	x, y = x * scale, y * scale
+	local w, h = UIParent:GetSize()
+	local vertical = bar and bar.GetHeight and bar:GetHeight() > bar:GetWidth() * 1.5
+	if vertical then
+		return x > w / 2 and "LEFT" or "RIGHT"
+	end
+	return y > h / 2 and "DOWN" or "UP"
+end
+
+-- Hands each toggle the Blizzard action buttons that hold its macro (secure frame refs, so out of combat only)
+local function ScanSlots()
+	if InCombatLockdown() then
+		slotsPending = true
+		return
+	end
+	slotsPending = false
+	local found = {}
+	for _, g in ipairs(GROUPS) do found[g] = {} end
+	for _, prefix in ipairs(BAR_BUTTONS) do
+		for i = 1, 12 do
+			local btn = _G[prefix .. i]
+			local slot = btn and (btn.action or btn:GetAttribute("action"))
+			if type(slot) == "number" and HasAction(slot) then
+				local kind, id = GetActionInfo(slot)
+				local body = kind == "macro" and id and GetMacroBody(id)
+				if body then
+					for _, g in ipairs(GROUPS) do
+						if body:find(g.toggle:GetName(), 1, true) then
+							table.insert(found[g], btn)
+						end
+					end
+				end
+			end
+		end
+	end
+	for g, list in pairs(found) do
+		for i, btn in ipairs(list) do
+			SecureHandlerSetFrameRef(g.toggle, "slot" .. i, btn)
+			g.toggle:SetAttribute("slotdir" .. i, SlotDirection(btn))
+		end
+		g.toggle:SetAttribute("slots", #list)
+		M.ApplyAnchor(g)
+	end
+end
+
+-- part of /fq debug: which action buttons hold a menu macro and which way the menu opens there
+function ns.DebugMenus()
+	for _, g in ipairs(GROUPS) do
+		local n = g.toggle and g.toggle:GetAttribute("slots") or 0
+		local parts = {}
+		for i = 1, n do
+			parts[#parts + 1] = tostring(g.toggle:GetAttribute("slotdir" .. i))
+		end
+		ns.Print(string.format("menu %s: %d slot(s) %s, button dir %s", g.key, n, table.concat(parts, ","),
+			tostring(g.toggle and g.toggle:GetAttribute("dir"))))
+	end
+end
+
+local scanQueued = false
+local function QueueScan()
+	if scanQueued then return end
+	scanQueued = true
+	C_Timer.After(0.2, function()
+		scanQueued = false
+		ScanSlots()
+	end)
 end
 
 function M:Rebuild()
@@ -228,9 +458,18 @@ function M:Init()
 	ev:RegisterEvent("PLAYER_REGEN_ENABLED")
 	ev:RegisterEvent("CVAR_UPDATE")
 	ev:SetScript("OnEvent", function(_, event)
-		if event == "PLAYER_REGEN_ENABLED" and not pending then return end
+		if event == "PLAYER_REGEN_ENABLED" then
+			if slotsPending then QueueScan() end
+			if not pending then return end
+		end
 		M:Rebuild()
 	end)
+	local bars = CreateFrame("Frame")
+	for _, event in ipairs({ "ACTIONBAR_SLOT_CHANGED", "UPDATE_MACROS", "ACTIONBAR_PAGE_CHANGED",
+		"UPDATE_BONUS_ACTIONBAR", "PLAYER_ENTERING_WORLD", "EDIT_MODE_LAYOUTS_UPDATED" }) do
+		bars:RegisterEvent(event)
+	end
+	bars:SetScript("OnEvent", QueueScan)
 	self:Rebuild()
 end
 

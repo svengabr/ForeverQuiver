@@ -218,8 +218,51 @@ local function Note(parent, c, y)
 	return text, text:GetStringHeight() + 12
 end
 
+-- Big menu icons to drag onto an action bar, like GSE's "Drag me!" (a click picks the macro up as well)
+local function DragMenus(parent, c, y)
+	local row = CreateFrame("Frame", nil, parent)
+	row:SetSize(COLUMN_W, 96)
+	row:SetPoint("TOPLEFT", 0, y - 6)
+	local slots = {}
+	local step = COLUMN_W / #c.menus
+	for i, menu in ipairs(c.menus) do
+		local key, label = menu[1], menu[2]
+		local b = CreateFrame("Button", nil, row)
+		b:SetSize(48, 48)
+		b:SetPoint("TOP", row, "TOPLEFT", step * (i - 0.5), 0)
+		b.icon = b:CreateTexture(nil, "ARTWORK")
+		b.icon:SetAllPoints()
+		b.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+		b.border = b:CreateTexture(nil, "OVERLAY")
+		b.border:SetTexture("Interface\\Buttons\\UI-Quickslot2")
+		b.border:SetPoint("TOPLEFT", -14, 14)
+		b.border:SetPoint("BOTTOMRIGHT", 14, -14)
+		b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+		local name = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+		name:SetPoint("TOP", b, "BOTTOM", 0, -6)
+		name:SetText(label)
+		local hint = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+		hint:SetPoint("TOP", name, "BOTTOM", 0, -2)
+		hint:SetText(L["Drag me!"])
+		b:RegisterForDrag("LeftButton")
+		b:SetScript("OnDragStart", function() ns.PickupMenuMacro(key) end)
+		b:SetScript("OnClick", function() ns.PickupMenuMacro(key) end)
+		b:SetScript("OnEnter", function(self)
+			ShowTip(self, label, L["Drag onto an action bar to use the menu from there."])
+		end)
+		b:SetScript("OnLeave", GameTooltip_Hide)
+		slots[i] = { b, key }
+	end
+	row.Refresh = function()
+		for _, s in ipairs(slots) do
+			s[1].icon:SetTexture(ns.MenuIcon and ns.MenuIcon(s[2]) or 134400)
+		end
+	end
+	return row, 104
+end
+
 local BUILDERS = { check = Check, slider = Slider, color = Color, select = Select, text = Text,
-	button = ActionButton, note = Note }
+	button = ActionButton, note = Note, dragmenus = DragMenus }
 
 -- Pages and sidebar ---------------------------------------------------------------------------------------------
 

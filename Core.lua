@@ -46,7 +46,7 @@ ns.defaults = {
 	flyout = { enabled = true, showAnchors = true, size = 32, direction = "UP",
 		traps = true, pet = true, aspects = true },
 	beast = { enabled = true, onlyUnknown = false, allClasses = false },
-	nav = { enabled = true, arrow = true, native = true },
+	nav = { enabled = true, auto = true, arrow = true, native = true },
 }
 
 -------------------------------------------------------------------------------
@@ -259,7 +259,21 @@ ns.demo = false
 
 function ns.SetDemo(on)
 	ns.demo = on and true or false
+	if not ns.demo then ns.demoFreeze = nil end
 	ns.RefreshAll()
+end
+
+-- The clock the simulation runs on. Normally the game's; while Shots.lua takes pictures it stands still at one
+-- moment per display (ns.demoFreeze[key]), so every picture shows the same bars.
+function ns.DemoClock(key)
+	local freeze = ns.demoFreeze
+	return freeze and freeze[key] or GetTime()
+end
+
+-- The player's name in the simulation: a made-up one in pictures, so no real character ends up in the gallery.
+function ns.DemoName()
+	local freeze = ns.demoFreeze
+	return freeze and freeze.name or ns.FullName("player") or "?"
 end
 
 local demoWatch = CreateFrame("Frame")
@@ -315,8 +329,11 @@ SlashCmdList.FOREVERQUIVER = function(msg)
 		ns.Print(L["Positions reset."])
 	elseif cmd == "demo" or cmd == "test" then
 		ns.SetDemo(not ns.demo)
+	elseif cmd == "shots" and ns.TakeShots then
+		if rest:lower() == "demo" then ns.ToggleShotsDemo() else ns.TakeShots() end
 	elseif cmd == "debug" and ns.DebugRange then
 		ns.DebugRange()
+		if ns.DebugMenus then ns.DebugMenus() end
 	elseif cmd == "way" and ns.Nav then
 		ns.Nav:SlashWay(rest)
 	elseif cmd == "clear" and ns.Nav then

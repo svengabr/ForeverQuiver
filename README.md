@@ -20,11 +20,14 @@ sizes, bar direction and the Tranq speech channel can be changed there, as in Qu
 - **Ammo warning** – count on screen when ammo runs low, with a sound and raid warning once.
 - **Spell menus on one key** – Traps, Pet and Aspects each get a button and a key binding
   (Key Bindings → Forever Quiver). The key opens the menu; keys 1–9 then cast its entries.
+  Drag a menu icon from the options onto an action bar slot and the menu pops up at that slot (Blizzard bars;
+  this creates the general macros "FQ Traps", "FQ Pet" and "FQ Aspects").
 - **Beast ability tooltip** – mouse over a tameable beast to see which pet ability (and rank) taming it teaches,
   marked *new* or *known*. Data from AllTheThings' WoW: Forever beast training list.
-- **Quest arrow for Questie** – Ctrl-click a Questie map icon or a quest in the Questie tracker: an arrow points
-  there and the game's map pin is set. Works through Questie's TomTom integration; if TomTom itself is
-  installed, TomTom handles it instead. `/fq way 45.2 67.8 [title]` sets a waypoint by hand, `/fq clear` removes it.
+- **Quest arrow for Questie** – always points at the nearest open objective of every quest in your log (the
+  turn-in once a quest is done), using Questie's data. With TomTom installed, TomTom gets the target and its arrow
+  shows the way. Ctrl-click a Questie map icon or tracker quest to send it somewhere else until you arrive;
+  `/fq way 45.2 67.8 [title]` sets a waypoint by hand, `/fq clear` removes it.
 
 ## Commands
 
@@ -34,6 +37,7 @@ sizes, bar direction and the Tranq speech channel can be changed there, as in Qu
 | `/fq unlock`, `/fq lock` | move frames |
 | `/fq reset` | reset positions |
 | `/fq demo` | simulation: all displays show test data |
+| `/fq shots` | takes the gallery screenshots with the simulation frozen; `/fq shots demo` only freezes it |
 | `/fq way <x> <y> [title]`, `/fq clear` | waypoint |
 
 ## Libraries

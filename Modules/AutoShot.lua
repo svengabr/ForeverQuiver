@@ -53,7 +53,7 @@ local function OnUpdate()
 	local width = frame:GetWidth() - 2
 	if ns.demo then
 		-- simulation: 2.5 s reload, 0.5 s aim, over and over
-		local t = now % 3
+		local t = ns.DemoClock("autoShot") % 3
 		local db = ns.db.autoShot
 		status:SetText("")
 		if t < 2.5 then
