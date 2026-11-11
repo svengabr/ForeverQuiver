@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0" stop-color="#2b2f3a"/><stop offset="1" stop-color="#12141a"/>
+    </radialGradient>
+    <radialGradient id="teal" cx="50%" cy="45%" r="55%">
+      <stop offset="0" stop-color="#1a7fa3"/><stop offset=".75" stop-color="#106a8a"/><stop offset="1" stop-color="#083e54"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff0a8"/><stop offset="1" stop-color="#e0a21c"/>
+    </linearGradient>
+    <linearGradient id="leather" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6e4420"/><stop offset=".45" stop-color="#a8703a"/><stop offset="1" stop-color="#5a3518"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="72" fill="url(#bg)"/>
+  <rect x="10" y="10" width="492" height="492" rx="64" fill="none" stroke="#c9a45c" stroke-opacity=".55" stroke-width="4"/>
+  <ellipse cx="256" cy="452" rx="150" ry="14" fill="#000" opacity=".35"/>
+  <polygon points="256.0,62.0 364.9,153.1 456.0,262.0 364.9,370.9 256.0,462.0 147.1,370.9 56.0,262.0 147.1,153.1" fill="#c8b48c" stroke="#2a1708" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="256" cy="262" r="170" fill="#c8b48c" stroke="#2a1708" stroke-width="4"/>
+  <circle cx="256" cy="262" r="154" fill="#96805a"/>
+  <circle cx="256" cy="262" r="146" fill="url(#teal)"/>
+  <g transform="translate(262 276) rotate(24)">
+    <g transform="rotate(-17 0 20)"><g>
+      <line x1="-22" y1="-108" x2="-22" y2="20" stroke="#2a1708" stroke-width="14" stroke-linecap="round"/>
+      <line x1="-22" y1="-108" x2="-22" y2="20" stroke="#faf0d2" stroke-width="9" stroke-linecap="round"/>
+      <polygon points="-22,-112 -41,-130 -41,-84 -22,-66" fill="#ffd678" stroke="#2a1708" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="-22,-112 -3,-130 -3,-84 -22,-66" fill="#e0a21c" stroke="#2a1708" stroke-width="3" stroke-linejoin="round"/>
+    </g></g>
+    <g transform="rotate(17 0 20)"><g>
+      <line x1="22" y1="-108" x2="22" y2="20" stroke="#2a1708" stroke-width="14" stroke-linecap="round"/>
+      <line x1="22" y1="-108" x2="22" y2="20" stroke="#faf0d2" stroke-width="9" stroke-linecap="round"/>
+      <polygon points="22,-112 3,-130 3,-84 22,-66" fill="#ffd678" stroke="#2a1708" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="22,-112 41,-130 41,-84 22,-66" fill="#e0a21c" stroke="#2a1708" stroke-width="3" stroke-linejoin="round"/>
+    </g></g>
+    <g>
+      <line x1="0" y1="-122" x2="0" y2="20" stroke="#2a1708" stroke-width="14" stroke-linecap="round"/>
+      <line x1="0" y1="-122" x2="0" y2="20" stroke="#faf0d2" stroke-width="9" stroke-linecap="round"/>
+      <polygon points="0,-126 -19,-144 -19,-98 0,-80" fill="#ffd678" stroke="#2a1708" stroke-width="3" stroke-linejoin="round"/>
+      <polygon points="0,-126 19,-144 19,-98 0,-80" fill="#e0a21c" stroke="#2a1708" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+    <path d="M -46 -34 L 46 -34 L 36 96 Q 0 112 -36 96 Z" fill="url(#leather)" stroke="#2a1708" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M -50 -40 L 50 -40 L 47 -14 L -47 -14 Z" fill="url(#gold)" stroke="#2a1708" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M -40 44 L 40 44 L 38 62 L -38 62 Z" fill="url(#gold)" stroke="#2a1708" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+</svg>

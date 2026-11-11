@@ -4,6 +4,7 @@
 ## Notes-deDE: Jäger-Werkzeuge für WoW: Forever: Auto-Shot-Timer, Zauberleiste, Reichweite, Aspekt- und Volltreffer-Erinnerung, Tranq-Ansage, Munitionswarnung, Zaubermenüs auf einer Taste, Wildtier-Fähigkeiten im Tooltip und ein Questpfeil für Questie.
 ## Author: Sven
 ## Version: 0.3.0
+## IconTexture: Interface\AddOns\ForeverQuiver\Icon
 ## SavedVariables: ForeverQuiverDB
 ## OptionalDeps: Questie, TomTom
 ## X-License: GPL-3.0-or-later

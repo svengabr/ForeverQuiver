@@ -24,6 +24,13 @@ Auto Shot bar, Questie arrow). Written from scratch; do not paste Quiver code (l
 - `Modules/Navigator.lua` – defines a minimal global `TomTom` (AddWaypoint/RemoveWaypoint) only when TomTom is not
   going to load, so Questie's TomTom hooks drive the arrow.
 
+## Artwork
+
+`media/logo.svg` is the source of the logo (a quiver on the teal medallion, in the look of the maintainer's other
+addons). `sh media/render-logo.sh` renders `media/logo.png` (512×512, the CurseForge logo) and `Icon.tga` (64×64,
+the addon list icon named in the TOC). `docs/curseforge.md` holds the texts for the CurseForge project page; its
+description is the README without the title and logo.
+
 ## Client facts
 
 - Interface 16001, Blizzard UI source: Gethe/wow-ui-source, branch `forever` (a 12.x-based client).

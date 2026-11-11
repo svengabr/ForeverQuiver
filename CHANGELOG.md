@@ -2,6 +2,7 @@
 
 ## 0.3.0
 
+- The addon list shows the addon's own icon.
 - `/fq shots` takes the screenshots for the gallery: the simulation frozen at one moment, a made-up character
   name, the rest of the interface hidden for the world picture. `/fq shots demo` shows the frozen simulation for
   pictures taken by hand.
