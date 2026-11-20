@@ -2,6 +2,8 @@
 
 ## 0.3.1
 
+- Fixed a Lua error from the aspect and Trueshot Aura displays when a buff on the player can't be read by addons
+  (secret aura).
 - `/fq shots`: the quest arrow shows the made-up target even when a real quest is tracked, and the world picture
   hides the names over players' heads.
 
