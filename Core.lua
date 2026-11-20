@@ -127,18 +127,45 @@ function ns.InRange(id, unit)
 	return r
 end
 
+local issecrettable = issecrettable or function() return false end
+
+-- Aura queries are gated on Forever (RequiresUnitAuraAccess / RequiresNonSecretAura): a buff another
+-- player put on us can be secret, and the call then errors from addon code. So skip indexes the client
+-- reports as secret, wrap the call, and treat a failure or a secret table as "no data".
+-- Returns aura, true on success; nil, true when there is no aura; nil, false when it could not be read.
+local function SafeAura(fn, ...)
+	local ok, aura = pcall(fn, ...)
+	if not ok then return nil, false end
+	if aura == nil then return nil, true end
+	if issecretvalue(aura) or issecrettable(aura) then return nil, false end
+	return aura, true
+end
+
+local function AuraIndexSecret(i)
+	local S = C_Secrets
+	if not (S and S.ShouldUnitAuraIndexBeSecret) then return false end
+	local ok, secret = pcall(S.ShouldUnitAuraIndexBeSecret, "player", i, "HELPFUL")
+	return not ok or secret == true
+end
+
 -- Iterates the player's helpful auras; callback(aura) returns true to stop.
 function ns.ForEachPlayerBuff(callback)
 	if not (C_UnitAuras and C_UnitAuras.GetAuraDataByIndex) then return end
 	for i = 1, 255 do
-		local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
-		if not aura then return end
-		if not issecretvalue(aura.name) and callback(aura) then return end
+		if not AuraIndexSecret(i) then
+			local aura, ok = SafeAura(C_UnitAuras.GetAuraDataByIndex, "player", i, "HELPFUL")
+			if not aura and ok then return end -- end of the list
+			if aura and not issecretvalue(aura.name) and callback(aura) then return end
+		end
 	end
 end
 
 function ns.FindPlayerBuffByName(name)
 	if not name then return nil end
+	if C_UnitAuras and C_UnitAuras.GetAuraDataBySpellName then
+		local aura, ok = SafeAura(C_UnitAuras.GetAuraDataBySpellName, "player", name, "HELPFUL")
+		if ok then return aura end
+	end
 	local found
 	ns.ForEachPlayerBuff(function(aura)
 		if aura.name == name then found = aura return true end

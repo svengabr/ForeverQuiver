@@ -97,6 +97,7 @@ read_globals = {
 	"YES",
 	"geterrorhandler",
 	"issecretvalue",
+	"issecrettable",
 	"strsplit",
 	"strtrim",
 	"wipe",
