@@ -11,6 +11,7 @@
 #@end-non-debug@
 ## IconTexture: Interface\AddOns\ForeverQuiver\Icon
 ## SavedVariables: ForeverQuiverDB
+## SavedVariablesPerCharacter: ForeverQuiverCharDB
 ## OptionalDeps: Questie, TomTom
 ## X-License: GPL-3.0-or-later
 ## X-Curse-Project-ID: 1798955

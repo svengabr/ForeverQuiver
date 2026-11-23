@@ -361,6 +361,8 @@ SlashCmdList.FOREVERQUIVER = function(msg)
 	elseif cmd == "debug" and ns.DebugRange then
 		ns.DebugRange()
 		if ns.DebugMenus then ns.DebugMenus() end
+	elseif cmd == "beast" and ns.DebugBeast then
+		ns.DebugBeast(rest)
 	elseif cmd == "way" and ns.Nav then
 		ns.Nav:SlashWay(rest)
 	elseif cmd == "clear" and ns.Nav then

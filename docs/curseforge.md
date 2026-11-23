@@ -34,7 +34,7 @@ Hunter tools for **WoW: Forever**, modelled on [Quiver](https://github.com/Sabin
 | Tranq Shot announcer | Announces your Tranquilizing Shot and lists the Tranq cooldown of every hunter with Forever Quiver. |
 | Ammo warning | A count on screen when your ammo runs low, with a sound. |
 | Spell menus | Traps, Pet and Aspects on one key each. The key opens the menu, 1 to 9 cast its entries. A menu can also sit on an action bar. |
-| Beast ability tooltip | Mouse over a tameable beast to see which pet ability taming it teaches, marked new or known. |
+| Beast ability tooltip | Mouse over a tameable beast to see which pet ability taming it teaches, marked new or known (open Beast Training once per character so the addon learns what you know). |
 | Quest arrow | Points at the nearest open objective of your quests, from Questie's data. With TomTom installed, TomTom's arrow takes over. |
 
 ## Using it

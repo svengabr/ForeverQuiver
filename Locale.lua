@@ -53,6 +53,7 @@ L["Beast Training:"] = "Wildtierausbildung:"
 L["%s (Rank %d)"] = "%s (Rang %d)"
 L["known"] = "bekannt"
 L["new"] = "neu"
+L["Open Beast Training once to see which abilities you know."] = "Öffne einmal die Wildtierausbildung, um zu sehen, welche Fähigkeiten du kennst."
 
 -- nav
 L["Arrived"] = "Angekommen"
