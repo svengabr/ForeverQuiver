@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.2
+
+- Beast ability tooltip: abilities you already learned no longer show as "new". The game keeps learned pet
+  abilities only in the Beast Training window, not in the spellbook, so the addon now remembers them per
+  character each time you open that window. Until you have opened it once, the tooltip lists the abilities
+  without a marker and says so. Abilities your current pet knows always count as known.
+- Beast ability tooltip knows the pet skills new on WoW: Forever: Dismember, Dust Cloud, Pinch, Savage Rend,
+  Sonic Blast, Swipe, Tendon Rip, Trickster's Dance and Web (data refreshed from AllTheThings).
+- `/fq beast` prints what the addon saved from Beast Training and why a beast's abilities show as new or known
+  (`/fq beast watch`, `/fq beast reset`).
+
 ## 0.3.1
 
 - Fixed a Lua error from the aspect and Trueshot Aura displays when a buff on the player can't be read by addons
