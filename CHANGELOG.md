@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- Pet XP bar: your pet's experience in the XP bar you already have, next to your own XP like a watched
+  reputation. Works with the game's bars and with FlareUI's XP bar. With XP and a reputation showing, it takes
+  the reputation's place (can be switched off). The numbers show on mouse-over or always, and the colour can be
+  changed. The game's bars only change out of combat.
+
 ## 0.3.2
 
 - Beast ability tooltip: abilities you already learned no longer show as "new". The game keeps learned pet

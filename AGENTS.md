@@ -23,6 +23,8 @@ Auto Shot bar, Questie arrow). Written from scratch; do not paste Quiver code (l
   to PLAYER_REGEN_ENABLED. Buttons register only for the click type matching `ActionButtonUseKeyDown`.
 - `Modules/Navigator.lua` – defines a minimal global `TomTom` (AddWaypoint/RemoveWaypoint) only when TomTom is not
   going to load, so Questie's TomTom hooks drive the arrow.
+- `Modules/PetXP.lua` – pet XP inside the game's status bars or FlareUI's XP bar. Never register with
+  `StatusTrackingBarManager`, write to its tables or call Edit Mode's layout code: that taints the action bars.
 
 ## Artwork
 

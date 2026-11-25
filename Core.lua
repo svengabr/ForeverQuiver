@@ -47,6 +47,7 @@ ns.defaults = {
 		traps = true, pet = true, aspects = true },
 	beast = { enabled = true, onlyUnknown = false, allClasses = false },
 	nav = { enabled = true, auto = true, arrow = true, native = true },
+	petxp = { enabled = true, cover = true, alwaysText = false, fill = "HONOR" },
 }
 
 -------------------------------------------------------------------------------

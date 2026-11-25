@@ -1,7 +1,7 @@
 ## Interface: 16001
 ## Title: Forever Quiver
-## Notes: Hunter utilities for WoW: Forever: Auto Shot timer, castbar, range indicator, aspect and Trueshot reminders, Tranq announcer, ammo warning, spell menus on one key, beast ability tooltips and a Questie quest arrow.
-## Notes-deDE: Jäger-Werkzeuge für WoW: Forever: Auto-Shot-Timer, Zauberleiste, Reichweite, Aspekt- und Volltreffer-Erinnerung, Tranq-Ansage, Munitionswarnung, Zaubermenüs auf einer Taste, Wildtier-Fähigkeiten im Tooltip und ein Questpfeil für Questie.
+## Notes: Hunter utilities for WoW: Forever: Auto Shot timer, castbar, range indicator, aspect and Trueshot reminders, Tranq announcer, ammo warning, spell menus on one key, beast ability tooltips, a Questie quest arrow and pet XP in the XP bar.
+## Notes-deDE: Jäger-Werkzeuge für WoW: Forever: Auto-Shot-Timer, Zauberleiste, Reichweite, Aspekt- und Volltreffer-Erinnerung, Tranq-Ansage, Munitionswarnung, Zaubermenüs auf einer Taste, Wildtier-Fähigkeiten im Tooltip, ein Questpfeil für Questie und Begleiter-EP in der EP-Leiste.
 ## Author: Sven
 #@debug@
 ## Version: dev
@@ -12,7 +12,7 @@
 ## IconTexture: Interface\AddOns\ForeverQuiver\Icon
 ## SavedVariables: ForeverQuiverDB
 ## SavedVariablesPerCharacter: ForeverQuiverCharDB
-## OptionalDeps: Questie, TomTom
+## OptionalDeps: Questie, TomTom, FlareUI
 ## X-License: GPL-3.0-or-later
 ## X-Curse-Project-ID: 1798955
 
@@ -31,6 +31,7 @@ Modules\Tranq.lua
 Modules\Flyout.lua
 Modules\BeastLore.lua
 Modules\Navigator.lua
+Modules\PetXP.lua
 UI\Style.lua
 UI\OptionSections.lua
 UI\OptionsWindow.lua

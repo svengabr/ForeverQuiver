@@ -160,6 +160,23 @@ function ns.BuildOptionSections()
 				Note(L["Bind the keys under Key Bindings > Forever Quiver. While a menu is open, keys 1-9 cast its entries."]),
 			},
 		} },
+		{ id = "petxp", label = L["Pet XP bar"], icon = "Ability_Hunter_BeastCall", columns = {
+			{
+				Check("petxp", "enabled", ENABLE),
+				Check("petxp", "cover", L["Replace the reputation"],
+					L["The XP bar has room for two. With XP and a reputation showing, the pet's experience takes the place of the reputation."]),
+				Check("petxp", "alwaysText", L["Always show the numbers"],
+					L["Otherwise they show while the mouse is over the bar, or always with the game's own setting for XP bar text."]),
+				Select("petxp", "fill", L["Colour"], {
+					{ "EXPERIENCE", L["Experience (purple)"] }, { "RESTED", L["Rested (blue)"] },
+					{ "REPUTATION", L["Reputation (green)"] }, { "HONOR", L["Honor (orange)"] },
+					{ "ARTIFACT", L["Artifact (gold)"] } }),
+			},
+			{
+				Note(L["Your pet's experience next to your own, in the game's XP bar or FlareUI's. Hidden without a pet."]),
+				Note(L["The game's bars only change out of combat."]),
+			},
+		} },
 		{ id = "beast", label = L["Beast abilities"], icon = "Ability_Hunter_BeastTaming", columns = {
 			{
 				Check("beast", "enabled", L["Beast ability tooltip"], L["Shows which pet ability a tameable beast teaches."]),
