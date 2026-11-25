@@ -25,6 +25,8 @@ Auto Shot bar, Questie arrow). Written from scratch; do not paste Quiver code (l
   going to load, so Questie's TomTom hooks drive the arrow.
 - `Modules/PetXP.lua` – pet XP inside the game's status bars or FlareUI's XP bar. Never register with
   `StatusTrackingBarManager`, write to its tables or call Edit Mode's layout code: that taints the action bars.
+- `Modules/CreatorTooltip.lua` – a line in the tooltips of the creator's characters, listed there by GUID. It has
+  no options and is not a registered module.
 
 ## Artwork
 

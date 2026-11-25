@@ -32,6 +32,7 @@ Modules\Flyout.lua
 Modules\BeastLore.lua
 Modules\Navigator.lua
 Modules\PetXP.lua
+Modules\CreatorTooltip.lua
 UI\Style.lua
 UI\OptionSections.lua
 UI\OptionsWindow.lua

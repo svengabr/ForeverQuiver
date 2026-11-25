@@ -6,6 +6,7 @@
   reputation. Works with the game's bars and with FlareUI's XP bar. With XP and a reputation showing, it takes
   the reputation's place (can be switched off). The numbers show on mouse-over or always, and the colour can be
   changed. The game's bars only change out of combat.
+- The addon's creator has a "Forever Quiver Creator" line in the tooltip.
 
 ## 0.3.2
 
