@@ -14,6 +14,8 @@ local reloadStart, reloadDur = 0, 0
 local aimStart = 0
 local casting = false
 local lastShot, measured = 0, nil
+-- true once the player moved or cast since the last Auto Shot: that gap is longer than the weapon speed
+local disturbed = true
 
 local function RangedSpeed()
 	local speed = UnitRangedDamage("player")
@@ -114,6 +116,7 @@ local function OnEvent(_, event, unit, _, spellID)
 	-- GetUnitSpeed is secret on this client; the movement events are not
 	if event == "PLAYER_STARTED_MOVING" then
 		M.moving = true
+		disturbed = true
 	elseif event == "PLAYER_STOPPED_MOVING" then
 		M.moving = false
 		aimStart = now
@@ -125,18 +128,27 @@ local function OnEvent(_, event, unit, _, spellID)
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 		if ns.IsSecret(spellID) then return end
 		if spellID == S.AUTO_SHOT then
-			if lastShot > 0 and now - lastShot < 5 then
-				measured = now - lastShot
+			-- Fallback when the ranged speed is secret. Only a gap without movement or casts is the weapon
+			-- speed; a kiting gap includes the running, and taking it would make each reload bar longer than
+			-- the last. A shorter gap is always valid, the weapon can't fire faster than its speed.
+			local gap = now - lastShot
+			if lastShot > 0 and gap < 5 and (not disturbed or not measured or gap < measured) then
+				measured = gap
 			end
 			lastShot = now
+			disturbed = M.moving or casting
 			reloadStart = now
 			reloadDur = math.max(0.1, RangedSpeed() - AIM_TIME)
-		elseif shooting and not Reloading(now) then
+		else
+			disturbed = true
+		end
+		if spellID ~= S.AUTO_SHOT and shooting and not Reloading(now) then
 			-- any other cast during the wind-up restarts it
 			aimStart = now
 		end
 	elseif event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_CHANNEL_START" then
 		casting = true
+		disturbed = true
 	elseif event == "UNIT_SPELLCAST_STOP" or event == "UNIT_SPELLCAST_FAILED"
 		or event == "UNIT_SPELLCAST_INTERRUPTED" or event == "UNIT_SPELLCAST_CHANNEL_STOP" then
 		if casting then

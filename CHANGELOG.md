@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1
+
+- Auto Shot bar: the reload no longer gets longer with every shot while kiting. The addon worked out the
+  weapon speed from the time between shots, and running between them made each estimate longer than the last.
+  Now only shots fired without moving or casting in between count.
+
 ## 0.4.0
 
 - Pet XP bar: your pet's experience in the XP bar you already have, next to your own XP like a watched
